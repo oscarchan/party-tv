@@ -66,7 +66,7 @@ import java.net.URISyntaxException;
  * Panoramio service.
  */
 public class PartyTvServer extends Activity implements OnClickListener {
-    private static final String DEFAULT_QUERY = "Los Angeles";
+    private static final String DEFAULT_QUERY = "San Jose";
     
     
     
@@ -147,6 +147,7 @@ public class PartyTvServer extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         mContext = this;
 
+        /*
         if (savedInstanceState != null) {
             mCameraFileName = savedInstanceState.getString("mCameraFileName");
         }
@@ -162,17 +163,7 @@ public class PartyTvServer extends Activity implements OnClickListener {
 
         alert.setTitle("Authentication");
         alert.setMessage("Authentication");
-            
-/*        
-     // Set an EditText view to get user input 
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-        input.setText("");
-        input.requestFocus();
-        input.setSelection(input.getText().length());
-        alert.setView(input);
-*/
-        
+                    
     	alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {        
         
@@ -187,33 +178,6 @@ public class PartyTvServer extends Activity implements OnClickListener {
             mApi.getSession().startAuthentication(PartyTvServer.this);
         }
         
-///////////
-      mImageManager = ImageManager.getInstance(mContext);
-      try {
-          handleIntent(getIntent());
-      } catch (final IOException e) {
-          e.printStackTrace();
-      } catch (final URISyntaxException e) {
-          e.printStackTrace();
-      } catch (final JSONException e) {
-          e.printStackTrace();
-      }
-
-      if (!isSplashShown) {
-          setContentView(R.layout.splash_screen);
-          isSplashShown = true;
-          CountDownTimer timer = new CountDownTimer(3000, 1000) {
-              public void onTick(long millisUntilFinished) {
-              }
-
-              public void onFinish() {
-                  initGridView();
-              }
-          }.start();
-      } else {	
-      	initGridView();  	       	
-       }
-      ///////
 
   
         
@@ -228,11 +192,40 @@ public class PartyTvServer extends Activity implements OnClickListener {
  
         
         alert.show();
+        */
+///////////
+    mImageManager = ImageManager.getInstance(mContext);
+    try {
+        handleIntent(getIntent());
+    } catch (final IOException e) {
+        e.printStackTrace();
+    } catch (final URISyntaxException e) {
+        e.printStackTrace();
+    } catch (final JSONException e) {
+        e.printStackTrace();
+    }
+
+    if (!isSplashShown) {
+        setContentView(R.layout.splash_screen);
+        isSplashShown = true;
+        CountDownTimer timer = new CountDownTimer(3000, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                initGridView();
+            }
+        }.start();
+    } else {	
+    	initGridView();  	       	
+     }
+    ///////
         
         
                 
         
     }
+    /*
     @Override
     protected void onResume() {
         super.onResume();
@@ -255,7 +248,7 @@ public class PartyTvServer extends Activity implements OnClickListener {
                 //Log.i(TAG, "Error authenticating", e);
             }
         }
-    }
+    }*/
 
     private GridView gridView;
 

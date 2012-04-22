@@ -18,6 +18,9 @@ package com.partytv.server;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -63,6 +66,7 @@ public class PanoramioItem implements Parcelable {
         mId = id;
         mContext = context;
         mLocation = location;
+//        mBitmap = getBitmapDrawable();
         mBitmap = getBitmap();
         final File cacheDir = mContext.getCacheDir();
         bitmapFile = new File(cacheDir, mId + ".jpg");
@@ -75,6 +79,8 @@ public class PanoramioItem implements Parcelable {
     public String getLocation() {
         return mLocation;
     }
+
+   
 
     public Bitmap getBitmap() {
         if (mBitmap != null)

@@ -57,7 +57,14 @@ public class ImageManager {
     private static final String THUMBNAIL_URL = "//www.panoramio.com/map/get_panoramas.php?"
             + "order=popularity" + "&set=public" + "&from=0" + "&to=300" + "&miny=%f" + "&minx=%f"
             + "&maxy=%f" + "&maxx=%f" + "&size=original";
+    //private static final String THUMBNAIL_URL = "//www.panoramio.com/map/get_panoramas.php?"
+      //      + "order=popularity" + "&set=public" + "&from=0" + "&to=300" + "&miny=%f" + "&minx=%f"
+        //    + "&maxy=%f" + "&maxx=%f" + "&size=original";
+//    private static final String THUMBNAIL_URL = "//www.panoramio.com/wapi/template/list.html?user=6863529";
+//            + "order=popularity" + "&set=public" + "&from=0" + "&to=300" + "&miny=%f" + "&minx=%f"
+  //          + "&maxy=%f" + "&maxx=%f" + "&size=original";
 
+    
     /**
      * Used to post results back to the UI thread
      */
@@ -219,10 +226,13 @@ public class ImageManager {
      * @throws IOException
      */
     public void load(String query) throws IOException, URISyntaxException, JSONException {
-        this.query = query;
+        
+    	//this.query = query;
+    	this.query = "San Jose";
         clear();
         mLoading = true;
 
+        
         GeoResponse location = null;
         try {
             location = new GeoCoderTask().execute(query).get();
@@ -236,8 +246,11 @@ public class ImageManager {
 
             mPrevThread = new ImageLoader(location.getMinLatitude(), location.getMinLongitude(),
                     location.getMaxLatitude(), location.getMaxLongitude(), query);
+//                 mPrevThread = new ImageLoader(0, 0,
+  //                  0, 0, query);
             mPrevThread.start();
-        } else {
+  
+    } else {
             Log.e(TAG, "Geocoder returned no location");
         }
     }
