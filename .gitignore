@@ -1,0 +1,8 @@
+# ignore the following file and directory
+
+.manager
+.idea
+.DS_Store
+target
+*.log
+*~
