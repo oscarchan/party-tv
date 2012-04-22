@@ -342,11 +342,11 @@ public class PartyTvServer extends Activity implements OnClickListener {
     	mLoggedIn = loggedIn;
     	if (loggedIn) {
     		//mSubmit.setText("Unlink from Dropbox");
-            mDisplay.setVisibility(View.VISIBLE);
+//            mDisplay.setVisibility(View.VISIBLE);
     	} else {
     		//mSubmit.setText("Link with Dropbox");
-            mDisplay.setVisibility(View.GONE);
-            mImage.setImageDrawable(null);
+//            mDisplay.setVisibility(View.GONE);
+//            mImage.setImageDrawable(null);
     	}
     }
 
