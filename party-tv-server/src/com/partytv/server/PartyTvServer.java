@@ -29,6 +29,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,6 +38,7 @@ import android.view.ViewGroup.OnHierarchyChangeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -161,6 +163,15 @@ public class PartyTvServer extends Activity implements OnClickListener {
         alert.setTitle("Authentication");
         alert.setMessage("Authentication");
             
+/*        
+     // Set an EditText view to get user input 
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        input.setText("");
+        input.requestFocus();
+        input.setSelection(input.getText().length());
+        alert.setView(input);
+*/
         
     	alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {        
@@ -216,7 +227,7 @@ public class PartyTvServer extends Activity implements OnClickListener {
           });
  
         
-        
+        alert.show();
         
         
                 
