@@ -26,22 +26,22 @@
 package partytv.client;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -105,95 +105,90 @@ public class PhotoShareActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        if (savedInstanceState != null) {
-//            mCameraFileName = savedInstanceState.getString("mCameraFileName");
-//        }
-//
-//        // We create a new AuthSession so that we can use the Dropbox API.
-//        AndroidAuthSession session = buildSession();
-//        mApi = new DropboxAPI<AndroidAuthSession>(session);
-//
-//        // Basic Android widgets
-//        setContentView(R.layout.main);
-//
-//        checkAppKeySetup();
-//
-//        mSubmit = (Button)findViewById(R.id.auth_button);
-//
-//        mSubmit.setOnClickListener(new OnClickListener() {
-//            public void onClick(View v) {
-//                // This logs you out if you're logged in, or vice versa
-//                if (mLoggedIn) {
-//                    logOut();
-//                } else {
-//                    // Start the remote authentication
-//                    mApi.getSession().startAuthentication(PhotoShareActivity.this);
-//                }
-//            }
-//        });
-//
-//        mDisplay = (LinearLayout)findViewById(R.id.logged_in_display);
-//
-//        // This is where a photo is displayed
-//        mImage = (ImageView)findViewById(R.id.image_view);
-//
-//        // This is the button to take a photo
-//        mPhoto = (Button)findViewById(R.id.photo_button);
-//
-//        mPhoto.setOnClickListener(new OnClickListener() {
-//            public void onClick(View v) {
-//                Intent intent = new Intent();
-//                // Picture from camera
-//                intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-//
-//                // This is not the right way to do this, but for some reason, having
-//                // it store it in
-//                // MediaStore.Images.Media.EXTERNAL_CONTENT_URI isn't working right.
-//
-//                Date date = new Date();
-//                DateFormat df = new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss");
-//
-//                String newPicFile = df.format(date) + ".jpg";
-//                String outPath = "/sdcard/" + newPicFile;
-//                File outFile = new File(outPath);
-//
-//                mCameraFileName = outFile.toString();
-//                Uri outuri = Uri.fromFile(outFile);
-//                intent.putExtra(MediaStore.EXTRA_OUTPUT, outuri);
-//                Log.i(TAG, "Importing New Picture: " + mCameraFileName);
-//                try {
-//                    startActivityForResult(intent, NEW_PICTURE);
-//                } catch (ActivityNotFoundException e) {
-//                    showToast("There doesn't seem to be a camera.");
-//                }
-//            }
-//        });
-//
-//
-//        // This is the button to take a photo
-//        mRoulette = (Button)findViewById(R.id.roulette_button);
-//
-//        mRoulette.setOnClickListener(new OnClickListener() {
-//            public void onClick(View v) {
-//                DownloadRandomPicture download = new DownloadRandomPicture(PhotoShareActivity.this, mApi, PHOTO_DIR, mImage);
-//                download.execute();
-//            }
-//        });
-//
-//        // Display the proper UI state if logged in or not
+        // --------- auth ----------
+        // We create a new AuthSession so that we can use the Dropbox API.
+        AndroidAuthSession session = buildSession();
+        mApi = new DropboxAPI<AndroidAuthSession>(session);
+
+        // Basic Android widgets
+        setContentView(R.layout.main);
+
+        checkAppKeySetup();
+        
+        if(mApi.getSession().isLinked()==false) {
+        	Toast.makeText(this, "starting auth", Toast.LENGTH_LONG).show();
+        	mApi.getSession().startAuthentication(PhotoShareActivity.this);
+        } else {
+        	// -------- upload -----------
+        	uploadFiles();
+        }
+
+        // Display the proper UI state if logged in or not
 //        setLoggedIn(mApi.getSession().isLinked());
-
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("mCameraFileName", mCameraFileName);
-        super.onSaveInstanceState(outState);
-    }
+
+	private void uploadFiles()
+	{
+		Toast.makeText(this, "trying to upload files", Toast.LENGTH_SHORT).show();
+		
+		List<String> fileList = getFileList(getIntent());
+
+		for (String path: fileList) {
+        	File file = new File(path);
+        	if(file.exists()) {
+        		UploadPicture uploadPicture = new UploadPicture(this, mApi, PHOTO_DIR, file);
+        		uploadPicture.execute();
+        	} else { 
+        		Toast.makeText(this, "file does not exist: " + path, Toast.LENGTH_SHORT).show();
+        	}
+		}
+	}
+
+
+	private List<String> getFileList(Intent intent)
+	{
+		ArrayList<String> list = new ArrayList<String>();
+		
+		if(Intent.ACTION_SEND.equals(intent.getAction())) {
+			Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+			if(uri!=null) {
+				String path = getRealPathFromURI(uri);
+				list.add(path);				
+			} else {
+				Toast.makeText(this, "Unable get SEND media: " + uri, Toast.LENGTH_LONG).show();
+			}
+		} else if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction())) {
+			if(intent.hasExtra(Intent.EXTRA_STREAM)==false) {
+				Toast.makeText(this, "Unable get SEND_MULTI media: empty payload", Toast.LENGTH_LONG).show();
+				return Collections.emptyList();
+			}
+		
+			ArrayList<Parcelable> urls = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+			
+			for (Parcelable p : urls) {
+				Uri uri = (Uri) p;
+				
+				String path = getRealPathFromURI(uri);
+				list.add(path);
+			}
+		}
+		return list;
+	}
+
+	private String getRealPathFromURI(Uri contentURI) {
+	    Cursor cursor = getContentResolver().query(contentURI, null, null, null, null); 
+	    cursor.moveToFirst(); 
+	    int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA); 
+	    return cursor.getString(idx); 
+	}
+	
 
     @Override
     protected void onResume() {
         super.onResume();
+        Toast.makeText(this, "PhotoShareActivity.onResume", Toast.LENGTH_SHORT).show();
+        
         AndroidAuthSession session = mApi.getSession();
 
         // The next part must be inserted in the onResume() method of the
@@ -207,11 +202,15 @@ public class PhotoShareActivity extends Activity {
                 // Store it locally in our app for later use
                 TokenPair tokens = session.getAccessTokenPair();
                 storeKeys(tokens.key, tokens.secret);
+                
+                uploadFiles();
                 setLoggedIn(true);
             } catch (IllegalStateException e) {
                 showToast("Couldn't authenticate with Dropbox:" + e.getLocalizedMessage());
                 Log.i(TAG, "Error authenticating", e);
             }
+        } else {
+        	Toast.makeText(this, "PhotoShareActivity.onResume: failed to auth", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -257,12 +256,16 @@ public class PhotoShareActivity extends Activity {
     private void setLoggedIn(boolean loggedIn) {
     	mLoggedIn = loggedIn;
     	if (loggedIn) {
-    		mSubmit.setText("Unlink from Dropbox");
-            mDisplay.setVisibility(View.VISIBLE);
+    		Toast.makeText(this, "logged in.. proceed", Toast.LENGTH_SHORT).show();
+//    		mSubmit.setText("Unlink from Dropbox");
+//            mDisplay.setVisibility(View.VISIBLE);
     	} else {
-    		mSubmit.setText("Link with Dropbox");
-            mDisplay.setVisibility(View.GONE);
-            mImage.setImageDrawable(null);
+    		Toast.makeText(this, "not logged in", Toast.LENGTH_LONG).show();
+    		
+//    		mSubmit.setText("Link with Dropbox");
+//            mDisplay.setVisibility(View.GONE);
+//            mImage.setImageDrawable(null);
+//    		mApi.getSession().startAuthentication(PhotoShareActivity.this);
     	}
     }
 

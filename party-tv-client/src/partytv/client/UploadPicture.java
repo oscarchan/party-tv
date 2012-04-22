@@ -89,10 +89,14 @@ public class UploadPicture extends AsyncTask<Void, Long, Boolean> {
             }
         });
         mDialog.show();
+        
+        Toast.makeText(context, "UploadPicture ctor", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
+        Toast.makeText(mContext, "UploadPicture starting", Toast.LENGTH_SHORT).show();
+    	
         try {
             // By creating a request, we get a handle to the putFile operation,
             // so we can cancel it later if we want to
