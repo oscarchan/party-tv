@@ -16,18 +16,23 @@
 
 package com.partytv.server;
 
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.app.ActionBar.Tab;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.widget.Toast;
 
-import com.dropbox.android.sample.DBRoulette;
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.session.AccessTokenPair;
+import com.dropbox.client2.session.AppKeyPair;
+import com.dropbox.client2.session.Session.AccessType;
 import com.example.google.tv.leftnavbar.LeftNavBar;
 import com.example.google.tv.leftnavbar.LeftNavBarService;
-import com.partytv.server.R;
 
 /**
  * This class helps with setting the left-side navigation bar in an Activity's layout.
@@ -36,6 +41,25 @@ public class PanoramioLeftNavService {
 
     private static Context mContext;
 
+    ///////////////////////////////////////////////////////////////////////////
+    //                      Your app-specific settings.                      //
+    ///////////////////////////////////////////////////////////////////////////
+
+    // Replace this with your app key and secret assigned by Dropbox.
+    // Note that this is a really insecure way to do this, and you shouldn't
+    // ship code which contains your key & secret in such an obvious way.
+    // Obfuscation is good.
+    final static private String APP_KEY = "ex7ktzbeatxkxfv";
+    final static private String APP_SECRET = "t4mzka6bcya5xbj";
+
+    // If you'd like to change the access type to the full Dropbox instead of
+    // an app folder, change this value.
+    final static private AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
+    
+    // You don't need to change these, leave them alone.
+    final static private String ACCOUNT_PREFS_NAME = "prefs";
+
+    
     public static LeftNavBar getLeftNavBar(Context context) {
         LeftNavBar bar = (LeftNavBarService.instance()).getLeftNavBar((Activity) context);
         mContext = context;
@@ -99,14 +123,44 @@ public class PanoramioLeftNavService {
 					
 					public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		                // This logs you out if you're logged in, or vice versa
-		                if (mLoggedIn) {
-		                    logOut();
-		                } else {
-		                    // Start the remote authentication
-		                    mApi.getSession().startAuthentication(.this);
-		                }
+						logOut();
 					}
 					
+				    private void logOut() {
+				    	Toast.makeText(mContext, "log ou", Toast.LENGTH_SHORT).show();
+			    		// We create a new AuthSession so that we can use the Dropbox API.
+				    	AndroidAuthSession session = buildSession();
+				    	DropboxAPI<AndroidAuthSession> api = new DropboxAPI<AndroidAuthSession>(session);
+        
+				        // Remove credentials from the session
+				        api.getSession().unlink();
+				
+				        // Clear our stored keys
+				        clearKeys();
+				    }
+
+				    private void clearKeys() {
+				    	if(mContext!=null) {
+					        SharedPreferences prefs = mContext.getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
+					        Editor edit = prefs.edit();
+					        edit.clear();
+					        edit.commit();
+				    	}
+				    }				    
+				    private AndroidAuthSession buildSession() {
+				        AppKeyPair appKeyPair = new AppKeyPair(APP_KEY, APP_SECRET);
+				        AndroidAuthSession session;
+				
+				        String[] stored = getKeys();
+				        if (stored != null) {
+				            AccessTokenPair accessToken = new AccessTokenPair(stored[0], stored[1]);
+				            session = new AndroidAuthSession(appKeyPair, ACCESS_TYPE, accessToken);
+				        } else {
+				            session = new AndroidAuthSession(appKeyPair, ACCESS_TYPE);
+				        }
+				
+				        return session;
+				    }				    
 					public void onTabReselected(Tab tab, FragmentTransaction ft) {
 						this.onTabSelected(tab, ft);
 					}
@@ -120,6 +174,8 @@ public class PanoramioLeftNavService {
         
         return bar;
     }
+    
+
 
     private static LeftNavBar.TabListener searchTabListener = new LeftNavBar.TabListener() {
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
