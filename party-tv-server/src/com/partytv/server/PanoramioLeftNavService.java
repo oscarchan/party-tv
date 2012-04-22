@@ -58,6 +58,8 @@ public class PanoramioLeftNavService {
     
     // You don't need to change these, leave them alone.
     final static private String ACCOUNT_PREFS_NAME = "prefs";
+    final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
+    final static private String ACCESS_SECRET_NAME = "ACCESS_SECRET";
 
     
     public static LeftNavBar getLeftNavBar(Context context) {
@@ -160,6 +162,25 @@ public class PanoramioLeftNavService {
 				        }
 				
 				        return session;
+				    }
+				    
+				    private String[] getKeys() {
+				    	if(mContext!=null) {
+					    	
+					        SharedPreferences prefs = mContext.getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
+					        String key = prefs.getString(ACCESS_KEY_NAME, null);
+					        String secret = prefs.getString(ACCESS_SECRET_NAME, null);
+					        if (key != null && secret != null) {
+					        	String[] ret = new String[2];
+					        	ret[0] = key;
+					        	ret[1] = secret;
+					        	return ret;
+					        } else {
+					        	return null;
+					        }
+				    	}
+				    	
+				    	return null;
 				    }				    
 					public void onTabReselected(Tab tab, FragmentTransaction ft) {
 						this.onTabSelected(tab, ft);
