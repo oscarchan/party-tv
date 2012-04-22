@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 
+import com.dropbox.android.sample.DBRoulette;
 import com.example.google.tv.leftnavbar.LeftNavBar;
 import com.example.google.tv.leftnavbar.LeftNavBarService;
 import com.partytv.server.R;
@@ -89,6 +90,31 @@ public class PanoramioLeftNavService {
         // bar.setDisplayOptions(LeftNavBar.DISPLAY_AUTO_EXPAND);
         bar.setShowHideAnimationEnabled(true);
         
+        bar.addTab(bar.newTab().setText(R.string.account)
+                .setTabListener(new TabListener() {
+					
+					public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+						// nothing
+					}
+					
+					public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		                // This logs you out if you're logged in, or vice versa
+		                if (mLoggedIn) {
+		                    logOut();
+		                } else {
+		                    // Start the remote authentication
+		                    mApi.getSession().startAuthentication(.this);
+		                }
+					}
+					
+					public void onTabReselected(Tab tab, FragmentTransaction ft) {
+						this.onTabSelected(tab, ft);
+					}
+				}), false);
+        bar.showOptionsMenu(false);
+        bar.setDisplayUseLogoEnabled(true);
+        // bar.setDisplayOptions(LeftNavBar.DISPLAY_AUTO_EXPAND);
+        bar.setShowHideAnimationEnabled(true);
         
         
         

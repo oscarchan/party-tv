@@ -21,6 +21,7 @@
     <string name="join_party">Join party</string>
         <string name="prev_party">Previous party</string>
     <string name="settings">Settings</string>
+    <string name="account">Account</string>
     <string name="app_name">Panoramio</string>
     <string name="search_hint">e.g. “New York”, “Beijing”, “Paris”...</string>
     <string name="menu_map">Map</string>

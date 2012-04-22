@@ -305,7 +305,10 @@ public class ImageManager {
         @Override
         public void run() {
             String url = THUMBNAIL_URL;
-            url = String.format(url, mMinLat, mMinLong, mMaxLat, mMaxLong);
+            //String url = "https://api-content.dropbox.com/1/files/dropbox/PartyTV";
+            
+            //String thumb_url = "https://api-content.dropbox.com/1/thumbnails/dropbox/PartyTV";
+            //url = String.format(url, mMinLat, mMinLong, mMaxLat, mMaxLong);
             try {
                 final URI uri = new URI("http", url, null);
                 final HttpGet get = new HttpGet(uri);
@@ -332,6 +335,7 @@ public class ImageManager {
                     final boolean done = i == count - 1;
                     final JSONObject obj = array.getJSONObject(i);
 
+                    
                     final long id = obj.getLong("photo_id");
                     String title = obj.getString("photo_title");
                     final String owner = obj.getString("owner_name");
@@ -342,6 +346,27 @@ public class ImageManager {
                     final double longitude = obj.getDouble("longitude");
                     final double width = obj.getDouble("width");
                     final double height = obj.getDouble("height");
+                    
+                    /*
+                    final double b_size = obj.getDouble("size");
+                    final double b_bytes = obj.getDouble("bytes");
+                    final String b_photoUrl = obj.getString("path");
+                    final boolean b_is_dir = obj.getBoolean("is_dir");
+                    final boolean b_is_deleted = obj.getBoolean("is_deleted");
+                    final String b_rev = obj.getString("rev");
+                    final boolean b_thumb_exists = obj.getBoolean("thumb_exists");
+                    final String b_root = obj.getString("root");
+                    
+                    final String owner = "";
+                    final String thumb = obj.getString("photo_file_url");
+                    final String ownerUrl = obj.getString("owner_url");
+                    final String photoUrl = obj.getString("photo_url");
+                    final double latitude = 0.0;
+                    final double longitude = 0.0;
+                    final double width = obj.getDouble("width");
+                    final double height = obj.getDouble("height");
+                    */
+                    
                     if (title == null) {
                         title = mContext.getString(R.string.untitled);
                     }
@@ -359,6 +384,9 @@ public class ImageManager {
                     final PanoramioItem item = new PanoramioItem(mContext, id, thumb,
                             (int) (latitude), (int) (longitude), title, owner, ownerUrl, photoUrl,
                             mQuery, mHandler);
+                    // final PanoramioItem item = new PanoramioItem(mContext, b_rev, thumb,
+                      //              (int) (latitude), (int) (longitude), title, owner, ownerUrl, b_photoUrl,
+                        //            mQuery, mHandler);
                     item.loadLargeBitmap();
                     mHandler.post(new Runnable() {
                         public void run() {
